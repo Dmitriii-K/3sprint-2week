@@ -26,3 +26,8 @@ export type FilterDocument = {
   URL: string;
   date: Date
 }
+
+export type NewPasswordRecoveryInputModel = {
+  newPassword: string;
+  recoveryCode: string
+}

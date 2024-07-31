@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { LoginInputModel, LoginSuccessViewModel, RegistrationConfirmationCodeModel, RegistrationEmailResending } from "../input-output-types/auth-type";
+import { LoginInputModel, LoginSuccessViewModel, NewPasswordRecoveryInputModel, RegistrationConfirmationCodeModel, RegistrationEmailResending } from "../input-output-types/auth-type";
 import { OutputErrorsType } from "../input-output-types/output-errors-type";
 import { jwtService } from "../adapters/jwtToken";
 import { UserInputModel } from "../input-output-types/users-type";
@@ -37,6 +37,32 @@ export class AuthController {
       res.sendStatus(505);
     }
   };
+
+  static authPasswordRecovery = async (req: Request<{}, {}, RegistrationEmailResending>, res: Response) => {
+    try {
+      const passwordRecovery = await authService.passwordRecovery(req.body.email);
+      if (passwordRecovery) {
+        res.sendStatus(204);
+      }
+    } catch (error) {
+      console.log(error);
+      res.sendStatus(505);
+    }
+  };
+
+  static authNewPassword = async (req: Request<{}, {}, NewPasswordRecoveryInputModel>, res: Response) => {
+    try {
+      const newPassword = await authService.newPassword(req.body);
+      if (newPassword) {
+        res.sendStatus(204);
+      } else {
+        res.status(400).json({ errorsMessages: [{field: "code", message: " Code validation failure "}]});
+      }
+    } catch (error) {
+      console.log(error);
+      res.sendStatus(505);
+    }
+  }
 
   static authRefreshToken = async (req: Request, res: Response) => {
     try {

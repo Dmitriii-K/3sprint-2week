@@ -7,6 +7,7 @@ import { AuthRepository } from "./authRepository";
 import { WithId } from "mongodb";
 import { jwtService } from "../adapters/jwtToken";
 import { SessionsType } from "../input-output-types/sessions-types";
+import { NewPasswordRecoveryInputModel } from "../input-output-types/auth-type";
 
 export const authService = {
     async checkCredentials(loginOrEmail: string) {
@@ -91,6 +92,12 @@ export const authService = {
                 } else {
             return false
             }
+    },
+    async newPassword(data: NewPasswordRecoveryInputModel) {
+        
+    },
+    async passwordRecovery(mail: string) {
+
     }
     // async authUserLogout(token: string) {
     //     const invalidToken = await AuthRepository.insertTokenFromDB(token);

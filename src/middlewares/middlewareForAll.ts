@@ -15,8 +15,21 @@ const urlPattern =
   /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/;
 const imailPattern = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 const loginPattern = /^[a-zA-Z0-9_-]*$/;
+const passwordRecoveryPattern = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 
 export const registrationEmail = [
+  body("email")
+  .isString()
+  .withMessage("not string")
+  .trim()
+  .not()
+  .isEmpty()
+  .matches(passwordRecoveryPattern)
+  .isEmail()
+  .withMessage("Invalid email format")
+];
+
+export const emailForPasswordRecoveryValidation = [
   body("email")
   .isString()
   .withMessage("not string")
@@ -26,7 +39,24 @@ export const registrationEmail = [
   .matches(imailPattern)
   .isEmail()
   .withMessage("Invalid email format")
-];
+]
+
+export const passwordAndCodeForRecoveryValidation = [
+  body("newPassword")
+  .isString()
+  .withMessage("not string")
+  .trim()
+  .not()
+  .isEmpty()
+  .isLength({ min: 6, max: 20 })
+  .withMessage("Invalid password"),
+  body("recoveryCode")
+  .isString()
+  .trim()
+  .not()
+  .isEmpty()
+  .withMessage("code is not string"),
+]
 
 export const validationCode = [
   body("code")
