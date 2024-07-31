@@ -1,7 +1,7 @@
 import { Response, Request, NextFunction } from "express";
 import { body, validationResult } from "express-validator";
 import { SETTINGS } from "../settings";
-import { apiCollection, blogCollection, sessionsCollection, userCollection } from "../db/mongo-db";
+// import { apiCollection, blogCollection, sessionsCollection, userCollection } from "../db/mongo-db";
 import { ObjectId, WithId } from "mongodb";
 import { SortDirection } from "../input-output-types/eny-type";
 import { jwtService } from "../adapters/jwtToken";
@@ -9,6 +9,7 @@ import { UserDBModel } from "../input-output-types/users-type";
 import { AuthRepository } from "../auth/authRepository";
 import { UserQueryRepository } from "../users/userQueryRepository";
 import { SessionsRepository } from "../security-devices/sessionsRepository";
+import { BlogModel } from "../db/schema-model-db";
 
 const urlPattern =
   /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/;
@@ -148,7 +149,7 @@ export const postInputValidation = [
     .isString()
     .custom(async (id) => {
       const ObtId = new ObjectId(id);
-      const blog = await blogCollection.findOne({ _id: ObtId });
+      const blog = await BlogModel.findOne({ _id: ObtId });
       if (!blog) {
         throw new Error("no blog!");
       }
@@ -323,8 +324,8 @@ export const checkRefreshToken = async (req: Request, res: Response, next: NextF
   const payload = jwtService.getUserIdByToken(token);
   if(!payload) return res.sendStatus(401);
   
-  const user : WithId<UserDBModel> | null= await userCollection.findOne({ _id : new ObjectId(payload.userId)});
-  // const user = await UserQueryRepository.findUserById(payload.userId)
+  // const user : WithId<UserDBModel> | null= await userCollection.findOne({ _id : new ObjectId(payload.userId)});
+  const user = await UserQueryRepository.findUserByMiddleware(payload.userId)
   if(user) {
     req.user = user;
     req.deviceId = payload.deviceId;

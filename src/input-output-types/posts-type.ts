@@ -22,7 +22,7 @@ export type PostViewModel = {
 };
 
 export type PostDbType = {
-  _id?: ObjectId;
+  // _id?: ObjectId;
   title: string;
   shortDescription: string;
   content: string;

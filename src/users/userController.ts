@@ -42,7 +42,7 @@ export class UserController {
         res.sendStatus(505);
         }
     };
-    static getUser = async (
+    static getUsers = async (
         req: Request<{}, {}, {}, TypeUserPagination>,
         res: Response<PaginatorUserViewModel>
     ) => {

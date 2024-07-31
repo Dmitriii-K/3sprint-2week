@@ -1,48 +1,49 @@
 import { ObjectId } from "mongodb";
-import { /*tokenCollection,*/ apiCollection, sessionsCollection, userCollection } from "../db/mongo-db";
+// import { /*tokenCollection,*/ apiCollection, sessionsCollection, userCollection } from "../db/mongo-db";
 import { UserDBModel } from "../input-output-types/users-type";
 import { SessionsType } from "../input-output-types/sessions-types";
+import { ApiModel, SessionModel, UserModel } from "../db/schema-model-db";
 
 export class AuthRepository {
     static async updateCode(userId: string, newCode: string) {
-        const result = await userCollection.updateOne({_id : new ObjectId(userId)}, {$set: {'emailConfirmation.confirmationCode': newCode}})
+        const result = await UserModel.updateOne({_id : new ObjectId(userId)}, {$set: {'emailConfirmation.confirmationCode': newCode}})
         return result.modifiedCount === 1;
     }
     static async checkUserByRegistration (login: string, email: string) {
-        return userCollection.findOne({ $or: [{ login: login }, { email: email }] });
+        return UserModel.findOne({ $or: [{ login: login }, { email: email }] });
     }
     static async findUserByLogiOrEmail (loginOrEmail: string) {
-        return userCollection.findOne({ $or: [{ login: loginOrEmail }, { email: loginOrEmail }] });
+        return UserModel.findOne({ $or: [{ login: loginOrEmail }, { email: loginOrEmail }] });
     }
     static async createUser (user: UserDBModel) {
-        const saveResult = await userCollection.insertOne(user);
-        return saveResult.insertedId.toString();
+        const saveResult = await UserModel.create(user);
+        return saveResult._id.toString();
     }
     static async findUserByCode (code: string) {
-        return userCollection.findOne({"emailConfirmation.confirmationCode": code});
+        return UserModel.findOne({"emailConfirmation.confirmationCode": code});
     }
     static async findUserByEmail (mail: string) {
-        return userCollection.findOne({email: mail});
+        return UserModel.findOne({email: mail});
     }
     static async resendMail (mail: string) {
-        return userCollection.findOne({email: mail});
+        return UserModel.findOne({email: mail});
     }
     static async updateConfirmation (_id: ObjectId) {
-        const result = await userCollection.updateOne({_id}, {$set: {'emailConfirmation.isConfirmed': true}})
+        const result = await UserModel.updateOne({_id}, {$set: {'emailConfirmation.isConfirmed': true}})
         return result.modifiedCount === 1;
     }
     static async createSession (session: SessionsType) {
-        const saveResult = await sessionsCollection.insertOne(session);
-        return saveResult.insertedId.toString();
+        const saveResult = await SessionModel.create(session);
+        return saveResult._id.toString();
     }
     static async findSessionFromDeviceId (deviceId: string) {
-        return sessionsCollection.findOne({device_id: deviceId})
+        return SessionModel.findOne({device_id: deviceId})
     }
     static async updateIat (iat: string,deviceId: string) {
-        return sessionsCollection.updateOne({device_id: deviceId}, { $set: { iat: iat }})
+        return SessionModel.updateOne({device_id: deviceId}, { $set: { iat: iat }})
     }
     static async deleteSession (deviceId: string) {
-        const result = await sessionsCollection.deleteOne({device_id: deviceId});
+        const result = await SessionModel.deleteOne({device_id: deviceId});
         if(result.deletedCount === 1) {
             return true
         } else {
@@ -50,8 +51,8 @@ export class AuthRepository {
         } 
     }
     static async dataRecording (ip: string, url: string, currentDate: Date) {
-        const result = await apiCollection.insertOne({ip: ip, URL: url, date: currentDate})
-        return result.insertedId.toString()
+        const result = await ApiModel.create({ip: ip, URL: url, date: currentDate})
+        return result._id.toString()
     }
 
     static async countingNumberRequests (ip: string, url: string, tenSecondsAgo: Date) {
@@ -60,7 +61,7 @@ export class AuthRepository {
             URL: url,
             date: { $gte: tenSecondsAgo }
         }
-        return apiCollection.countDocuments(filterDocument)
+        return ApiModel.countDocuments(filterDocument)
 
     }
     // static async findRefreshTokenFromDB (token: string) {

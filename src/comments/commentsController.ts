@@ -28,7 +28,7 @@ export class CommentsController {
                 return; 
             }
             const updateResult = await CommentService.updateComment(req.params.id, req.body.content);
-            if(updateResult === true) {
+            if(updateResult) {
                 res.sendStatus(204);
             }
             }

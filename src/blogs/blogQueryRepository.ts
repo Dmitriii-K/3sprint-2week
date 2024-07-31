@@ -1,6 +1,7 @@
 import { ObjectId, WithId } from "mongodb";
 import { BlogDbType, BlogViewModel, TypeBlogHalper, TypePostForBlogHalper } from "../input-output-types/blogs-type";
-import { blogCollection, postCollection } from "../db/mongo-db";
+// import { blogCollection, postCollection } from "../db/mongo-db";
+import { BlogModel, PostModel } from "../db/schema-model-db";
 import { PostQueryRepository } from "../posts/postsQueryRepository";
 import { halper } from "../middlewares/middlewareForAll";
 import { PostDbType } from "../input-output-types/posts-type";
@@ -11,13 +12,13 @@ export class BlogQueryRepository {
         const search = helper.searchNameTerm
         ? { name: { $regex: helper.searchNameTerm, $options: "i" } }
         : {};
-        const items: WithId<BlogDbType>[] = await blogCollection
+        const items: WithId<BlogDbType>[] = await BlogModel
             .find(search)
-            .sort(queryParams.sortBy, queryParams.sortDirection)
+            .sort({ [queryParams.sortBy]: queryParams.sortDirection })
             .skip((queryParams.pageNumber - 1) * queryParams.pageSize)
             .limit(queryParams.pageSize)
-            .toArray();
-        const totalCount = await blogCollection.countDocuments(search);
+            .exec();
+        const totalCount = await BlogModel.countDocuments(search);
         const blogs = {
             pagesCount: Math.ceil(totalCount / queryParams.pageSize),
             page: queryParams.pageNumber,
@@ -29,7 +30,7 @@ export class BlogQueryRepository {
     }
     static async getBlogById (id: string) {
         const mongoId = new ObjectId(id)
-        const blog =  await blogCollection.findOne({_id: mongoId});
+        const blog =  await BlogModel.findOne({_id: mongoId});
         if (!blog) {
             return null;
         };
@@ -37,7 +38,7 @@ export class BlogQueryRepository {
     }
     static async getPostForBlogById (id: string) {
         const mongoId = new ObjectId(id)
-        const post =  await postCollection.findOne({_id: mongoId});
+        const post =  await PostModel.findOne({_id: mongoId});
         if (!post) {
             return null;
         };
@@ -45,13 +46,13 @@ export class BlogQueryRepository {
     }
     static async getPostFofBlog (helper: TypePostForBlogHalper, id: string) {
         const queryParams = halper(helper);
-        const items: WithId<PostDbType>[] = await postCollection
+        const items: WithId<PostDbType>[] = await PostModel
             .find({ blogId: id })
-            .sort(queryParams.sortBy, queryParams.sortDirection)
+            .sort({ [queryParams.sortBy]: queryParams.sortDirection })
             .skip((queryParams.pageNumber - 1) * queryParams.pageSize)
             .limit(queryParams.pageSize)
-            .toArray();
-        const totalCount = await postCollection.countDocuments({ blogId: id });
+            .exec();
+        const totalCount = await PostModel.countDocuments({ blogId: id });
         const posts = {
             pagesCount: Math.ceil(totalCount / queryParams.pageSize),
             page: queryParams.pageNumber,

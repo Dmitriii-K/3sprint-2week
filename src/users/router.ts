@@ -8,7 +8,7 @@ import { authMiddleware } from "../middlewares/middlewareForAll";
 
 export const usersRouter = Router();
 
-usersRouter.get("/", authMiddleware, UserController.getUser);
+usersRouter.get("/", authMiddleware, UserController.getUsers);
 usersRouter.post(
   "/",
   authMiddleware,

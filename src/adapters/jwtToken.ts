@@ -22,7 +22,7 @@ export const jwtService = {
 generateToken (user: WithId<UserDBModel>, deviceId?: string) {
 
   const payload: PayloadType = {
-    userId: user._id!.toString(),
+    userId: user._id.toString(),
     email: user.email,
     login: user.login,
     deviceId:deviceId ?? randomUUID()

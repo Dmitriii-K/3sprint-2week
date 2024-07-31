@@ -17,7 +17,7 @@ export type CommentViewModel = {
 };
 
 export type CommentDBType = {
-  _id?: ObjectId;
+  // _id?: ObjectId;
   postId?: string;
   content:	string;
   createdAt:	string;

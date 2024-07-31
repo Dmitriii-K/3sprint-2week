@@ -1,18 +1,19 @@
-import { userCollection } from "../db/mongo-db";
+// import { userCollection } from "../db/mongo-db";
+import { UserModel } from "../db/schema-model-db";
 import { UserDBModel } from "../input-output-types/users-type";
 import { ObjectId } from "mongodb";
 
 export class UserRepository {
     static async insertUser (user: UserDBModel) {
-        const saveResult = await userCollection.insertOne(user);
-        return saveResult.insertedId.toString();
+        const saveResult = await UserModel.create(user);
+        return saveResult._id.toString();
     }
     static async findUserByLogiOrEmail (data: {login: string, email:string}) {
-        return userCollection.findOne({ $or: [{ login: data.login }, { email: data.email }] });
+        return UserModel.findOne({ $or: [{ login: data.login }, { email: data.email }] });
     }
     static async deleteUser (id: string) {
         const mongoId = new ObjectId(id);
-        const user = await userCollection.deleteOne({_id: mongoId});
+        const user = await UserModel.deleteOne({_id: mongoId});
         if (user.deletedCount === 1) {
             return true;
         };

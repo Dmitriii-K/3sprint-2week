@@ -6,7 +6,7 @@ import { DeviceViewModel } from "../input-output-types/device-type";
 export class SessionsControllers {
     static deleteAllSessionsExceptCurrentOne = async (req: Request, res: Response) => {
         try {
-            const userId = req.user._id.toString();
+            const userId = req.user._id;
             const device_id = req.deviceId;
 
             const result = await SessionsService.deleteAllSessionsExceptCurrentOne(userId, device_id);

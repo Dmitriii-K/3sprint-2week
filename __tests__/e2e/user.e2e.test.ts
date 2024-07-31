@@ -1,5 +1,6 @@
+import mongoose from "mongoose";
 import { req } from "./tests.helper";
-import { userCollection, connectDB } from "../../src/db/mongo-db";
+// import { userCollection, runDb, /*connectDB*/ } from "../../src/db/mongo-db";
 import { SETTINGS } from "../../src/settings";
 import { UserInputModel} from "../../src/input-output-types/users-type";
 import { codedAuth } from "../../src/middlewares/middlewareForAll";
@@ -12,14 +13,23 @@ describe('E2E Tests', () => {
     const user = user1;
     // const session: DeviceViewModel = [];
 
-    beforeAll(async () => {
-    await connectDB();
-    await userCollection.drop();
-    });
+    // beforeAll(async () => {
+    // await connectDB();
+    // await userCollection.drop();
+    // });
+    // beforeAll(async () => {
+    //     /* Connecting to the database. */
+    //     await mongoose.connect(SETTINGS.MONGO_URL)
+    // })
 
-    afterAll(async () => {
-    await userCollection.drop();
-});
+    // afterAll(async () => {
+    // await userCollection.drop();
+    // });
+    // afterAll(async () => {
+    //     /* Closing database connection after each test. */
+    //     await mongoose.connection.close()
+    // })
+
     it("should create", async () => {
       // зачищаем базу данных
     await userCollection.drop();
