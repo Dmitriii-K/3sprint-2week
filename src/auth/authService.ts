@@ -2,7 +2,7 @@ import {randomUUID} from "crypto";
 import {add} from "date-fns"; 
 import { UserDBModel, UserInputModel } from "../input-output-types/users-type";
 import { bcryptService } from "../adapters/bcrypt";
-import { sendMailService } from "../adapters/sendEmail";
+import { passwordRecovery, sendMailService } from "../adapters/sendEmail";
 import { AuthRepository } from "./authRepository";
 import { WithId } from "mongodb";
 import { jwtService } from "../adapters/jwtToken";
@@ -93,11 +93,34 @@ export const authService = {
             return false
             }
     },
-    async newPassword(data: NewPasswordRecoveryInputModel) {
-        
+    async newPassword(data: NewPasswordRecoveryInputModel): Promise<boolean> {
+        // Проверяем, существует ли пользователь с таким кодом восстановления
+    const user = await UserModel.findOne({ recoveryCode: input.recoveryCode });
+    if (!user) {
+      return false; // Пользователь не найден или код недействителен
+    }
+    // Хешируем новый пароль
+    const hashedPassword = await hashPassword(input.newPassword);
+    // Обновляем пароль пользователя
+    user.password = hashedPassword;
+    user.recoveryCode = null; // Сбрасываем код восстановления
+    await user.save();
+    return true;
     },
-    async passwordRecovery(mail: string) {
-
+    async passwordRecovery(mail: string): Promise<boolean> {
+        // Проверяем, существует ли пользователь с таким email
+    const user = await UserModel.findOne({ email });
+    if (!user) {
+      return false; // Пользователь не найден
+    }
+    // Генерируем код восстановления
+    const recoveryCode = generateRecoveryCode();
+    // Сохраняем код восстановления в базе данных для пользователя
+    user.recoveryCode = recoveryCode;
+    await user.save();
+    // Отправляем письмо с кодом восстановления
+    await passwordRecovery.sendMail(mail, recoveryCode);
+    return true;
     }
     // async authUserLogout(token: string) {
     //     const invalidToken = await AuthRepository.insertTokenFromDB(token);
