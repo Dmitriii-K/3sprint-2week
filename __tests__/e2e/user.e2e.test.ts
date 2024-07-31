@@ -5,6 +5,7 @@ import { SETTINGS } from "../../src/settings";
 import { UserInputModel} from "../../src/input-output-types/users-type";
 import { codedAuth } from "../../src/middlewares/middlewareForAll";
 import { user1 } from "./datasets";
+import { UserModel } from "../../src/db/schema-model-db";
 
 // Определяем глобальную переменную
 // global.refreshToken = null;
@@ -17,22 +18,22 @@ describe('E2E Tests', () => {
     // await connectDB();
     // await userCollection.drop();
     // });
-    // beforeAll(async () => {
-    //     /* Connecting to the database. */
-    //     await mongoose.connect(SETTINGS.MONGO_URL)
-    // })
+    beforeAll(async () => {
+        /* Connecting to the database. */
+        await mongoose.connect(SETTINGS.MONGO_URL)
+    })
 
     // afterAll(async () => {
     // await userCollection.drop();
     // });
-    // afterAll(async () => {
-    //     /* Closing database connection after each test. */
-    //     await mongoose.connection.close()
-    // })
+    afterAll(async () => {
+        /* Closing database connection after each test. */
+        await mongoose.connection.close()
+    })
 
     it("should create", async () => {
       // зачищаем базу данных
-    await userCollection.drop();
+    await UserModel.deleteMany({});
     const newUser: UserInputModel = {
         login: "login123",
         password: "password",

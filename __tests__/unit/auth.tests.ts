@@ -44,6 +44,7 @@ describe('UNIT', () => {
 
     describe('registerUser', () => {
         const registrationUser = authService.registerUser;
+        AuthRepository.checkUserByRegistration = jest.fn().mockImplementation((user: string) => null)
         // bcryptService.createHashPassword = jest.fn().mockImplementation((pass: string) => {hashPpass: "password"});
 
         AuthRepository.createUser = jest.fn().mockImplementation((newUser:string) => undefined);
