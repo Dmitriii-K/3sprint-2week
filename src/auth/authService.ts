@@ -95,32 +95,29 @@ export const authService = {
     },
     async newPassword(data: NewPasswordRecoveryInputModel): Promise<boolean> {
         // Проверяем, существует ли пользователь с таким кодом восстановления
-    const user = await UserModel.findOne({ recoveryCode: input.recoveryCode });
-    if (!user) {
-      return false; // Пользователь не найден или код недействителен
-    }
-    // Хешируем новый пароль
-    const hashedPassword = await hashPassword(input.newPassword);
-    // Обновляем пароль пользователя
-    user.password = hashedPassword;
-    user.recoveryCode = null; // Сбрасываем код восстановления
-    await user.save();
-    return true;
+        const user: WithId<UserDBModel> | null = await AuthRepository.findUserByCode(data.recoveryCode);
+        // console.log(user)
+            if(!user) return false; // Пользователь не найден или код недействителен
+            if(user.emailConfirmation.confirmationCode !== data.recoveryCode ) return false;
+        // Хешируем новый пароль
+        const password = await bcryptService.createHashPassword(data.newPassword);
+        // Обновляем пароль пользователя
+        const result = await AuthRepository.updatePassword(user._id.toString(), password)
+        if(result) {
+            return true
+                } else {
+            return false
+            }
     },
     async passwordRecovery(mail: string): Promise<boolean> {
         // Проверяем, существует ли пользователь с таким email
-    const user = await UserModel.findOne({ email });
-    if (!user) {
-      return false; // Пользователь не найден
-    }
-    // Генерируем код восстановления
-    const recoveryCode = generateRecoveryCode();
-    // Сохраняем код восстановления в базе данных для пользователя
-    user.recoveryCode = recoveryCode;
-    await user.save();
-    // Отправляем письмо с кодом восстановления
-    await passwordRecovery.sendMail(mail, recoveryCode);
-    return true;
+        const user: WithId<UserDBModel> | null = await AuthRepository.findUserByEmail(mail);
+            if(!user)return false; // Пользователь не найден
+        // Генерируем код восстановления
+        const recoveryCode = randomUUID();
+            AuthRepository.updateCode(user._id.toString(), recoveryCode),
+            await passwordRecovery.sendMail(mail, recoveryCode)
+        return true;
     }
     // async authUserLogout(token: string) {
     //     const invalidToken = await AuthRepository.insertTokenFromDB(token);

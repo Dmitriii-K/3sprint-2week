@@ -6,7 +6,11 @@ import { ApiModel, SessionModel, UserModel } from "../db/schema-model-db";
 
 export class AuthRepository {
     static async updateCode(userId: string, newCode: string) {
-        const result = await UserModel.updateOne({_id : new ObjectId(userId)}, {$set: {'emailConfirmation.confirmationCode': newCode}})
+        const result = await UserModel.updateOne({_id: userId}, {$set: {'emailConfirmation.confirmationCode': newCode}})
+        return result.modifiedCount === 1;
+    }
+    static async updatePassword(userId: string, pass: string) {
+        const result = await UserModel.updateOne({_id: userId}, {$set: {password: pass}})
         return result.modifiedCount === 1;
     }
     static async checkUserByRegistration (login: string, email: string) {

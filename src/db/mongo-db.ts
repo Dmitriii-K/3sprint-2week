@@ -64,11 +64,10 @@ import { SessionsType } from "../input-output-types/sessions-types";
 //   }
 // };
 
-const dbName = SETTINGS.DB_NAME
 const mongoURI = SETTINGS.MONGO_URL
 export async function runDb() {
     try {
-        await mongoose.connect(mongoURI) // не работает,  как исправить?
+        await mongoose.connect(mongoURI)
         console.log('it is ok')
     } catch (e) {
         console.log('no connection')

@@ -40,10 +40,8 @@ export class AuthController {
 
   static authPasswordRecovery = async (req: Request<{}, {}, RegistrationEmailResending>, res: Response) => {
     try {
-      const passwordRecovery = await authService.passwordRecovery(req.body.email);
-      if (passwordRecovery) {
+    await authService.passwordRecovery(req.body.email);
         res.sendStatus(204);
-      }
     } catch (error) {
       console.log(error);
       res.sendStatus(505);
@@ -56,7 +54,7 @@ export class AuthController {
       if (newPassword) {
         res.sendStatus(204);
       } else {
-        res.status(400).json({ errorsMessages: [{field: "code", message: " Code validation failure "}]});
+        res.status(400).json({ errorsMessages: [{ message: "Code validation failure", field: "recoveryCode" }] });
       }
     } catch (error) {
       console.log(error);
